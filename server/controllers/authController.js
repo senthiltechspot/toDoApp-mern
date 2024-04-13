@@ -64,13 +64,13 @@ const loginUser = async (req, res) => {
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
         maxAge: 7 * 24 * 60 * 60 * 1000,
-        sameSite: "none",
+        // sameSite: "none",
         secure: false, // set to true if using HTTPS
       })
       .cookie("token", token, {
         httpOnly: true,
         maxAge: 60 * 60 * 1000,
-        sameSite: "none",
+        // sameSite: "none",
         secure: false,
       })
       .status(200)
