@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { createTaskAPI, updateTaskAPI } from "../../api/taskAPi";
 import { useTask } from "../../contextAPI/TaskProvider";
+import { useToast } from "../../contextAPI/ToastProvider";
 
 const AddTask = ({ data, edit, onClose }) => {
+  const { handletoast } = useToast();
   const [formData, setFormData] = useState({
     title: data ? data.title : "",
     description: data ? data.description : "",
@@ -32,13 +34,25 @@ const AddTask = ({ data, edit, onClose }) => {
 
       if (res.status === 200 || res.status === 201) {
         fetchTasks();
-        alert(edit ? "Task updated successfully" : "Task created successfully");
+        handletoast({
+          type: "success",
+          message: edit
+            ? "Task updated successfully"
+            : "Task created successfully",
+        });
         onClose();
       } else {
-        alert(res.data.message || "Error handling task");
+        handletoast({
+          type: "error",
+          message: res.data.message || "Error handling task",
+        });
       }
     } catch (error) {
-      alert("Error handling task");
+      console.error("Error handling task:", error);
+      handletoast({
+        type: "error",
+        message: error.message || "Error handling task",
+      });
     }
     // Reset form fields
     setFormData({
@@ -124,8 +138,7 @@ const AddTask = ({ data, edit, onClose }) => {
             onClick={onClose}
             className="px-7 py-2 text-white bg-red-500 rounded"
           >
-            {" "}
-            Close{" "}
+            Close
           </button>
           <button
             type="submit"

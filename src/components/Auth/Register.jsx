@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { signupAPI } from "../../api/authapi";
+import { useToast } from "../../contextAPI/ToastProvider";
 
 const Register = ({ setLogComp, serverOnline }) => {
   const [formData, setFormData] = useState({
@@ -7,7 +8,7 @@ const Register = ({ setLogComp, serverOnline }) => {
     email: "",
     password: "",
   });
-
+  const { handletoast } = useToast();
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -19,13 +20,26 @@ const Register = ({ setLogComp, serverOnline }) => {
     try {
       const data = await signupAPI(formData);
       if (data.status === 201) {
-        setLogComp("login");
+        handletoast({
+          type: "success",
+          message: "Sign Up Successful, please login",
+        });
+        setTimeout(() => {
+          setLogComp("login");
+        }, 1000);
       } else {
+        handletoast({
+          type: "error",
+          message: data || "Error signing up",
+        });
         throw new Error(data || "Error signing up");
       }
     } catch (error) {
       console.error("Error signing up:", error.message);
-      alert(error.message);
+      handletoast({
+        type: "error",
+        message: error.message || "Error signing up",
+      });
     }
   };
 

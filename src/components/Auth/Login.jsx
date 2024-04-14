@@ -1,39 +1,44 @@
 import React, { useState } from "react";
 import { loginAPI } from "../../api/authapi";
+import { useToast } from "../../contextAPI/ToastProvider";
 
 const Login = ({ setLogComp, login, serverOnline }) => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-
+  const { handletoast } = useToast();
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   const data = await loginAPI(formData);
-  //   if (data.status === 200) {
-  //     login(false);
-  //   } else {
-  // console.error("Error signing:", data);
-  // alert(data || "Error signing");
-  //   }
-  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const data = await loginAPI(formData);
       if (data.status === 200) {
-        login(false);
+        handletoast({
+          type: "success",
+          message: "Login Successful",
+        });
+        setTimeout(() => {
+          login(false);
+        }, 1000);
       } else {
+        alert(data || "Error signing");
+        handletoast({
+          type: "error",
+          message: data || "Error signing up",
+        });
         throw new Error(data || "Error signing up");
       }
     } catch (error) {
-      alert(error.message || "Error signing");
+      handletoast({
+        type: "error",
+        message: error.message || "Error signing up",
+      });
     }
   };
 

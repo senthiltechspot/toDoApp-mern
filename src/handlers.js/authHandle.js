@@ -4,8 +4,8 @@ export const validateToken = async (login, logout) => {
   try {
     // Make a request to your backend server to validate the refresh token
     // Handle refresh token validation
-    const { data } = await baseAPI.get("/auth/refresh");
-    if (data.status === "success") {
+    const data = await baseAPI.get("/auth/refresh");
+    if (data.status === 200) {
       login();
       localStorage.setItem("token", data?.data?.accessToken);
     }
