@@ -136,8 +136,8 @@ const RefreshToken = async (req, res) => {
 
 const signOut = async (req, res) => {
   res
-    .clearCookie("token")
-    .clearCookie("refreshToken")
+    .clearCookie("refreshToken", { sameSite: "none", secure: true })
+    .clearCookie("token", { sameSite: "none", secure: true })
     .status(200)
     .json({ message: "Logged out successfully" });
 };

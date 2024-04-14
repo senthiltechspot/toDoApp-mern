@@ -14,14 +14,16 @@ const Tasks = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterOption, setFilterOption] = useState("All");
 
-  const filteredTasks = tasks && tasks.filter((task) => {
-    const normalizedSearchQuery = searchQuery.toLowerCase();
-    const normalizedTitle = task.title.toLowerCase();
-    return (
-      (filterOption === "All" || task.status === filterOption) &&
-      normalizedTitle.includes(normalizedSearchQuery)
-    );
-  });
+  const filteredTasks =
+    tasks &&
+    tasks.filter((task) => {
+      const normalizedSearchQuery = searchQuery.toLowerCase();
+      const normalizedTitle = task.title.toLowerCase();
+      return (
+        (filterOption === "All" || task.status === filterOption) &&
+        normalizedTitle.includes(normalizedSearchQuery)
+      );
+    });
 
   // Group tasks by due date
   const groupedTasks = {};
@@ -38,6 +40,17 @@ const Tasks = () => {
     (a, b) => new Date(a) - new Date(b)
   );
 
+  const handleLogout = async () => {
+    try {
+      const res = await logoutAPI();
+      if (res.status === 200 || res.status === 201) {
+        validateToken(login, logout);
+      }
+    } catch (error) {
+      console.log(error);
+      validateToken(login, logout);
+    }
+  };
   return (
     <div className="flex flex-col mx-7 mt-7">
       <div className="flex justify-between items-center mb-4">
@@ -51,10 +64,7 @@ const Tasks = () => {
 
         <button
           className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-          onClick={() => {
-            logoutAPI();
-            validateToken(login, logout);
-          }}
+          onClick={handleLogout}
         >
           LogOut
         </button>
