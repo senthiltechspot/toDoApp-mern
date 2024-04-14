@@ -136,16 +136,8 @@ const RefreshToken = async (req, res) => {
 
 const signOut = async (req, res) => {
   res
-    .cookie("refreshToken", "", {
-      maxAge: 0,
-      sameSite: "none",
-      secure: true,
-    })
-    .cookie("token", "", {
-      maxAge: 0,
-      sameSite: "none",
-      secure: true,
-    })
+    .clearCookie("token")
+    .clearCookie("refreshToken")
     .status(200)
     .json({ message: "Logged out successfully" });
 };
