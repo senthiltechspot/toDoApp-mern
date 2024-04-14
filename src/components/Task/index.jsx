@@ -9,21 +9,21 @@ import { useAuth } from "../../contextAPI/Auth";
 
 const Tasks = () => {
   const { login, logout } = useAuth();
-  const { tasks } = useTask();
+  const { tasks, ClearTask } = useTask();
   const [showAddTask, setShowAddTask] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterOption, setFilterOption] = useState("All");
-
   const filteredTasks =
-    tasks &&
-    tasks.filter((task) => {
-      const normalizedSearchQuery = searchQuery.toLowerCase();
-      const normalizedTitle = task.title.toLowerCase();
-      return (
-        (filterOption === "All" || task.status === filterOption) &&
-        normalizedTitle.includes(normalizedSearchQuery)
-      );
-    });
+    tasks && tasks.length > 0
+      ? tasks.filter((task) => {
+          const normalizedSearchQuery = searchQuery.toLowerCase();
+          const normalizedTitle = task.title.toLowerCase();
+          return (
+            (filterOption === "All" || task.status === filterOption) &&
+            normalizedTitle.includes(normalizedSearchQuery)
+          );
+        })
+      : [];
 
   // Group tasks by due date
   const groupedTasks = {};
@@ -45,12 +45,14 @@ const Tasks = () => {
       const res = await logoutAPI();
       if (res.status === 200 || res.status === 201) {
         validateToken(login, logout);
+        ClearTask();
       }
     } catch (error) {
       console.log(error);
       validateToken(login, logout);
     }
   };
+
   return (
     <div className="flex flex-col mx-7 mt-7">
       <div className="flex justify-between items-center mb-4">
@@ -89,16 +91,20 @@ const Tasks = () => {
         </select>
       </div>
       {/* Render tasks grouped by due date */}
-      {sortedGroupKeys.map((date) => (
-        <div key={date} className="mb-7">
-          <h2 className="text-xl font-semibold mb-2">{date}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {groupedTasks[date].map((task) => (
-              <TaskCard key={task._id} task={task} />
-            ))}
+      {sortedGroupKeys.length > 0 ? (
+        sortedGroupKeys.map((date) => (
+          <div key={date} className="mb-7">
+            <h2 className="text-xl font-semibold mb-2">{date}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {groupedTasks[date].map((task) => (
+                <TaskCard key={task._id} task={task} />
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))
+      ) : (
+        <div>No tasks found</div>
+      )}
 
       {showAddTask && (
         <div className="fixed inset-0 flex items-center justify-center">

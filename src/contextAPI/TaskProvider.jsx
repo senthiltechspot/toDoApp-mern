@@ -10,8 +10,18 @@ export const TaskProvider = ({ children }) => {
   const [tasks, setTasks] = useState([]);
   const { isLoggedIn } = useAuth();
   const fetchTasks = async () => {
-    const data = await getTaskAPI();
-    setTasks(data);
+    try {
+      const data = await getTaskAPI();
+      // Data should be a array
+      if (data && Array.isArray(data)) {
+        setTasks(data);
+      } else {
+        setTasks([]);
+      }
+    } catch (error) {
+      console.error(error);
+      setTasks([]);
+    }
   };
 
   useEffect(() => {
@@ -23,8 +33,12 @@ export const TaskProvider = ({ children }) => {
     }
   }, [isLoggedIn]);
 
+  const ClearTask = () => {
+    setTasks([]);
+  };
+
   return (
-    <TaskContext.Provider value={{ tasks, fetchTasks }}>
+    <TaskContext.Provider value={{ tasks, fetchTasks, ClearTask }}>
       {children}
     </TaskContext.Provider>
   );
