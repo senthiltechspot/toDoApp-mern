@@ -1,11 +1,4 @@
-import mongoose from 'mongoose';
-import { dbConfig } from './db.config.js';
-
-const env = process.env.NODE_ENV || 'development';
-
-// Load db config
-// Construct MongoDB connection URI
-const { mongoURI } = dbConfig[env];
+import mongoose from "mongoose";
 
 // MongoDB options
 const options = {
@@ -14,12 +7,13 @@ const options = {
 };
 
 // Connect to MongoDB
-mongoose.connect(mongoURI, options)
+mongoose
+  .connect(process.env.MONGODBURI, options)
   .then(() => {
-    console.log('Connection to MongoDB has been established successfully.');
+    console.log("Connection to MongoDB has been established successfully.");
   })
   .catch((err) => {
-    console.error('Unable to connect to MongoDB:', err);
+    console.error("Unable to connect to MongoDB:", err);
   });
 
 // Export mongoose connection
