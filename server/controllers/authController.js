@@ -117,16 +117,14 @@ const RefreshToken = async (req, res) => {
 
     res
       .cookie("token", accessToken, {
-        httpOnly: true,
-        maxAge: 60 * 60 * 1000,
-        sameSite: "none",
-        secure: false,
-      })
-      .cookie("refreshToken", newRefreshToken, {
-        httpOnly: true,
         maxAge: 7 * 24 * 60 * 60 * 1000,
         sameSite: "none",
-        secure: false,
+        secure: true,
+      })
+      .cookie("refreshToken", newRefreshToken, {
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        sameSite: "none",
+        secure: true,
       })
       .status(200)
       .json({ message: "Token refreshed successfully" });
@@ -136,4 +134,20 @@ const RefreshToken = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, RefreshToken };
+const signOut = async (req, res) => {
+  res
+    .cookie("refreshToken", "", {
+      maxAge: 0,
+      sameSite: "none",
+      secure: true,
+    })
+    .cookie("token", "", {
+      maxAge: 0,
+      sameSite: "none",
+      secure: true,
+    })
+    .status(200)
+    .json({ message: "Logged out successfully" });
+};
+
+export { registerUser, loginUser, RefreshToken, signOut };

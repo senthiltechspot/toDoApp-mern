@@ -27,3 +27,13 @@ export async function signupAPI(values) {
     return error.response.data.message || error;
   }
 }
+
+export async function logoutAPI() {
+  try {
+    const data = await baseAPI.get("/auth/logout");
+    return data;
+  } catch (error) {
+    console.error(error);
+    return error.response.data.message || error;
+  }
+}

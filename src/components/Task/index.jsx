@@ -3,14 +3,18 @@ import { getTaskAPI } from "../../api/taskAPi";
 import TaskCard from "./TaskCard";
 import AddTask from "./AddTask";
 import { useTask } from "../../contextAPI/TaskProvider";
+import { logoutAPI } from "../../api/authapi";
+import { validateToken } from "../../handlers.js/authHandle";
+import { useAuth } from "../../contextAPI/Auth";
 
 const Tasks = () => {
+  const { login, logout } = useAuth();
   const { tasks } = useTask();
   const [showAddTask, setShowAddTask] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterOption, setFilterOption] = useState("All");
 
-  const filteredTasks = tasks.filter((task) => {
+  const filteredTasks = tasks && tasks.filter((task) => {
     const normalizedSearchQuery = searchQuery.toLowerCase();
     const normalizedTitle = task.title.toLowerCase();
     return (
@@ -43,6 +47,16 @@ const Tasks = () => {
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           Add Task
+        </button>
+
+        <button
+          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+          onClick={() => {
+            logoutAPI();
+            validateToken(login, logout);
+          }}
+        >
+          LogOut
         </button>
       </div>
       <div className="flex gap-3 mb-7">
