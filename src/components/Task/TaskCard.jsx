@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import AddTask from "./AddTask";
 import { bgColor, Status } from "../../Utils/constants";
+import { deleteTaskAPI } from "../../api/taskAPi";
+import { useTask } from "../../contextAPI/TaskProvider";
+import { useToast } from "../../contextAPI/ToastProvider";
 const TaskCard = ({ task }) => {
   const [showDescription, setShowDescription] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-
+  const { fetchTasks } = useTask();
+  const { handletoast } = useToast();
   const formatDate = (dateString) => {
     const d = new Date(dateString);
     const year = d.getFullYear();
@@ -20,7 +24,29 @@ const TaskCard = ({ task }) => {
     setIsEditing(false);
     setShowDescription(!showDescription);
   };
-
+  const handleDelete = async () => {
+    try {
+      const res = await deleteTaskAPI({ id: task._id });
+      if (res.status === 200 || res.status === 201) {
+        fetchTasks();
+        handletoast({
+          type: "success",
+          message: "Task deleted successfully",
+        });
+      } else {
+        handletoast({
+          type: "error",
+          message: "Something went wrong",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      handletoast({
+        type: "error",
+        message: "Something went wrong",
+      });
+    }
+  };
   return (
     <div
       className={`flex flex-col w-full px-3 py-2 border bg-slate-700 shadow-md shadow-gray-700 rounded ${
@@ -39,7 +65,10 @@ const TaskCard = ({ task }) => {
           {formatDate(task.duedate)}
         </p>
 
-        <i className="bi bi-trash text-red-500 flex justify-end"></i>
+        <i
+          onClick={handleDelete}
+          className="cursor-pointer bi bi-trash text-red-500 flex justify-end"
+        ></i>
       </div>
 
       {/* Modal */}
