@@ -57,7 +57,7 @@ MONGODBURI="your mongodb uri"
 JWT_SECRET="somerandomjwtsecretkey"
 REFRESH_TOKEN_SECRET="somerandomjwtsecretkeyforRefreshToken"
 VITE_BACKEND_URL="http://localhost:3000/api/v1"
-
+```
 
 Replace the placeholders with your actual MongoDB connection string, JWT secret, and Refresh Token secret.
 
