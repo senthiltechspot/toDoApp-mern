@@ -40,22 +40,24 @@ This is a Todo App built using the MERN stack (MongoDB, Express.js, React.js, an
 ### Installation
 
 1. Clone the repository:
-   git clone https://github.com/senthiltechspot/toDoApp-mern.git
+  `git clone https://github.com/senthiltechspot/toDoApp-mern.git`
 
 2. Navigate to the project directory:
-   cd todo-app
+   `cd todo-app`
 
 3. Install dependencies:
-   npm install
+  `npm install`
 
 ### Environment Variables
 
 Create a `.env` file in the root directory of the project and add the following variables:
 
+```dotenv
 MONGODBURI="your mongodb uri"
 JWT_SECRET="somerandomjwtsecretkey"
 REFRESH_TOKEN_SECRET="somerandomjwtsecretkeyforRefreshToken"
 VITE_BACKEND_URL="http://localhost:3000/api/v1"
+
 
 Replace the placeholders with your actual MongoDB connection string, JWT secret, and Refresh Token secret.
 
