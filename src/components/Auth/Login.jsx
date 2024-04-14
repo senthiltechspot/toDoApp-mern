@@ -12,14 +12,28 @@ const Login = ({ setLogComp, login, serverOnline }) => {
     setFormData({ ...formData, [name]: value });
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   const data = await loginAPI(formData);
+  //   if (data.status === 200) {
+  //     login(false);
+  //   } else {
+  // console.error("Error signing:", data);
+  // alert(data || "Error signing");
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const data = await loginAPI(formData);
-    if (data.status === 200) {
-      login(false);
-    } else {
-      console.error("Error signing:", data);
-      alert(data || "Error signing");
+
+    try {
+      const data = await loginAPI(formData);
+      if (data.status === 200) {
+        login(false);
+      } else {
+        throw new Error(data || "Error signing up");
+      }
+    } catch (error) {
+      alert(error.message || "Error signing");
     }
   };
 

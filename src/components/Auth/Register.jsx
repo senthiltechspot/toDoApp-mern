@@ -15,13 +15,17 @@ const Register = ({ setLogComp, serverOnline }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const data = await signupAPI(formData);
-    console.log(data);
-    if (data.status === 201) {
-      setLogComp("login");
-    } else {
-      console.error("Error signing up:", data);
-      alert(data || "Error signing up");
+
+    try {
+      const data = await signupAPI(formData);
+      if (data.status === 201) {
+        setLogComp("login");
+      } else {
+        throw new Error(data || "Error signing up");
+      }
+    } catch (error) {
+      console.error("Error signing up:", error.message);
+      alert(error.message);
     }
   };
 

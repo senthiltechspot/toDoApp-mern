@@ -1,23 +1,9 @@
 import React, { useState } from "react";
 import AddTask from "./AddTask";
-// {
-//     "_id": "661adbc204483e80f64b6e18",
-//     "user": "661aa740fc92be5024602afc",
-//     "title": "test2",
-//     "description": "test description",
-//     "status": "INPROGRESS",
-//     "duedate": "2024-04-13T17:16:08.814Z",
-//     "__v": 0
-// }
+import { bgColor, Status } from "../../Utils/constants";
 const TaskCard = ({ task }) => {
   const [showDescription, setShowDescription] = useState(false);
-
-  const Status = {
-    PENDING: <i className="bi bi-hourglass text-red-500"></i>,
-    INPROGRESS: <i className="bi bi-arrow-repeat text-yellow-500"></i>,
-    CANCELLED: <i className="bi bi-x-circle text-red-500"></i>,
-    DONE: <i className="bi bi-check-circle text-green-500"></i>,
-  };
+  const [isEditing, setIsEditing] = useState(false);
 
   const formatDate = (dateString) => {
     const d = new Date(dateString);
@@ -31,30 +17,22 @@ const TaskCard = ({ task }) => {
   };
 
   const toggleDescription = () => {
+    setIsEditing(false);
     setShowDescription(!showDescription);
-  };
-
-  const bgColor = {
-    PENDING: "border-red-500",
-    INPROGRESS: "border-yellow-500",
-    CANCELLED: "border-gray-600",
-    DONE: "border-green-500",
   };
 
   return (
     <div
-      className={`flex flex-col w-full px-3 py-2 border rounded ${
+      className={`flex flex-col w-full px-3 py-2 border bg-slate-700 shadow-md shadow-gray-700 rounded ${
         bgColor[task.status]
       } `}
     >
-      <div className="flex items-center justify-between">
+      <div
+        onClick={toggleDescription}
+        className="flex cursor-pointer items-center justify-between"
+      >
         <div className="w-[15%]">{Status[task.status]}</div>
-        <h2
-          onClick={toggleDescription}
-          className="cursor-pointer w-[60%] text-lg truncate"
-        >
-          {task.title}
-        </h2>
+        <h2 className=" w-[60%] text-lg truncate">{task.title}</h2>
       </div>
       <div className="flex items-center justify-between mt-2 w-full">
         <p className="text-sm cursor-pointer" onClick={toggleDescription}>
@@ -67,10 +45,29 @@ const TaskCard = ({ task }) => {
       {/* Modal */}
       {showDescription && (
         <div className="fixed inset-0 flex items-center justify-center">
-          {/* <h3 className="text-lg font-bold">{task.title}</h3>
-            <p className="text-sm">{task.description}</p>
-            <p className="text-sm">{formatDate(task.duedate)}</p> */}
-          <AddTask data={task} edit={true} />
+          {isEditing ? (
+            <AddTask data={task} edit={isEditing} onClose={toggleDescription} />
+          ) : (
+            <div className="sm:w-full lg:w-1/3  text-black bg-white p-4 rounded shadow-lg shadow-gray-400 z-10">
+              <h3 className="text-xl font-bold mb-2">{task.title}</h3>
+              <p className="mb-2">{task.description}</p>
+              <div className="flex items-center mb-2">
+                <span className="text-sm font-semibold mr-2">Status:</span>
+                <span className={`px-2 py-1 rounded ${task.status}`}>
+                  {task.status}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-sm">Due Date: {formatDate(task.duedate)}</p>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="bg-blue-500 w-[100px] hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2"
+                >
+                  Edit
+                </button>
+              </div>
+            </div>
+          )}
           {/* Backdrop */}
           <div
             onClick={toggleDescription}

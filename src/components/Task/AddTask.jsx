@@ -1,13 +1,15 @@
 import React, { useState } from "react";
+import { createTaskAPI, updateTaskAPI } from "../../api/taskAPi";
+import { useTask } from "../../contextAPI/TaskProvider";
 
-const AddTask = ({ data, edit }) => {
+const AddTask = ({ data, edit, onClose }) => {
   const [formData, setFormData] = useState({
     title: data ? data.title : "",
     description: data ? data.description : "",
     status: data ? data.status : "",
-    duedate: data ? data.duedate : "",
+    duedate: data ? new Date(data.duedate).toISOString().substring(0, 10) : "",
   });
-
+  const { fetchTasks } = useTask();
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -16,10 +18,28 @@ const AddTask = ({ data, edit }) => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // You can perform form submission logic here, e.g., sending data to backend
-    console.log(formData);
+
+    try {
+      let res;
+      if (edit) {
+        formData.id = data._id;
+        res = await updateTaskAPI(formData);
+      } else {
+        res = await createTaskAPI(formData);
+      }
+
+      if (res.status === 200 || res.status === 201) {
+        fetchTasks();
+        alert(edit ? "Task updated successfully" : "Task created successfully");
+        onClose();
+      } else {
+        alert(res.data.message || "Error handling task");
+      }
+    } catch (error) {
+      alert("Error handling task");
+    }
     // Reset form fields
     setFormData({
       title: "",
@@ -98,12 +118,22 @@ const AddTask = ({ data, edit }) => {
             required
           />
         </div>
-        <button
-          type="submit"
-          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-        >
-          Add Task
-        </button>
+        <div className="flex justify-between items-center mt-5">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-7 py-2 text-white bg-red-500 rounded"
+          >
+            {" "}
+            Close{" "}
+          </button>
+          <button
+            type="submit"
+            className="inline-flex justify-center py-2 px-7 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            {edit ? "Update" : "Create"} Task
+          </button>
+        </div>
       </form>
     </div>
   );

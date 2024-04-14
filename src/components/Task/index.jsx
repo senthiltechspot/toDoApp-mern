@@ -2,24 +2,40 @@ import React, { useEffect, useState } from "react";
 import { getTaskAPI } from "../../api/taskAPi";
 import TaskCard from "./TaskCard";
 import AddTask from "./AddTask";
+import { useTask } from "../../contextAPI/TaskProvider";
 
 const Tasks = () => {
-  const [tasks, setTasks] = useState([]);
+  const { tasks } = useTask();
   const [showAddTask, setShowAddTask] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterOption, setFilterOption] = useState("All");
 
-  useEffect(() => {
-    // get tasks
-    const getTasks = async () => {
-      const data = await getTaskAPI();
-      console.log(data);
-      setTasks(data);
-    };
-    setTimeout(() => {
-      getTasks();
-    }, 3000);
-  }, []);
+  const filteredTasks = tasks.filter((task) => {
+    const normalizedSearchQuery = searchQuery.toLowerCase();
+    const normalizedTitle = task.title.toLowerCase();
+    return (
+      (filterOption === "All" || task.status === filterOption) &&
+      normalizedTitle.includes(normalizedSearchQuery)
+    );
+  });
+
+  // Group tasks by due date
+  const groupedTasks = {};
+  filteredTasks.forEach((task) => {
+    const dueDate = new Date(task.duedate).toDateString();
+    if (!groupedTasks[dueDate]) {
+      groupedTasks[dueDate] = [];
+    }
+    groupedTasks[dueDate].push(task);
+  });
+
+  // Sort group keys (dates) in ascending order
+  const sortedGroupKeys = Object.keys(groupedTasks).sort(
+    (a, b) => new Date(a) - new Date(b)
+  );
+
   return (
-    <div className="flex flex-col mx-5 mt-7">
+    <div className="flex flex-col mx-7 mt-7">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold mb-4">Tasks</h1>
         <button
@@ -29,28 +45,42 @@ const Tasks = () => {
           Add Task
         </button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        {/* <div className={`flex flex-col w-full px-3 py-2 border rounded  `}>
-            <div className="flex items-center justify-between">
-              <div className="w-[15%]">Status</div>
-              <h2 className="cursor-pointe w-[60%] text-lg truncate"></h2>
-              <p className="text-sm cursor-pointer w-[20%]">Due Date</p>
-              <p className="text-sm cursor-pointer w-[10%] flex items-end">
-                Delete
-              </p>
-            </div>
-          </div> */}
-        {tasks.map((task) => (
-          <TaskCard key={task._id} task={task} />
-        ))}
+      <div className="flex gap-3 mb-7">
+        <input
+          type="text"
+          placeholder="Search..."
+          className="w-full rounded px-4 py-2"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <select
+          className="w-1/3 px-4 py-2 rounded"
+          value={filterOption}
+          onChange={(e) => setFilterOption(e.target.value)}
+        >
+          <option value="All">All</option>
+          <option value="PENDING">To Do</option>
+          <option value="INPROGRESS">In Progress</option>
+          <option value="DONE">Done</option>
+        </select>
       </div>
+      {/* Render tasks grouped by due date */}
+      {sortedGroupKeys.map((date) => (
+        <div key={date} className="mb-7">
+          <h2 className="text-xl font-semibold mb-2">{date}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {groupedTasks[date].map((task) => (
+              <TaskCard key={task._id} task={task} />
+            ))}
+          </div>
+        </div>
+      ))}
 
       {showAddTask && (
         <div className="fixed inset-0 flex items-center justify-center">
-          <AddTask />
-          {/* Backdrop */}
+          <AddTask onClose={() => setShowAddTask(false)} />
           <div
-            onClick={() => setShowAddTask(!showAddTask)}
+            onClick={() => setShowAddTask(false)}
             className="fixed inset-0 bg-black opacity-50"
           ></div>
         </div>
